@@ -1,5 +1,7 @@
 name: Build APK
 
+# Runs automatically on every push/PR to main, and can also be triggered
+# manually from the Actions tab ("Run workflow").
 on:
   push:
     branches: [ "main" ]
@@ -21,14 +23,14 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      # ubuntu-latest runners ship with the Android SDK preinstalled
+      # (ANDROID_HOME / ANDROID_SDK_ROOT already set), so no separate
+      # SDK-installer action is needed here.
+      - name: Accept Android SDK licenses
+        run: yes | sdkmanager --licenses > /dev/null 2>&1 || true
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v3
-
-      - name: Accept SDK licenses
-        run: yes | sdkmanager --licenses > /dev/null || true
 
       - name: Build debug APK
         run: gradle assembleDebug --no-daemon --stacktrace
